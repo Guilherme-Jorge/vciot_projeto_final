@@ -1,0 +1,4 @@
+mahotas
+opencv-python
+pandas
+websocket-client
