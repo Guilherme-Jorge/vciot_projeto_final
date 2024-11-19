@@ -6,8 +6,6 @@ import datetime
 
 class MahotasMaskService:
     def __init__(self, path_list):
-        self.current_img = None
-        self.current_img_mask = None
         self.path_list = path_list
         self._create_dirs(path_list)
         
@@ -16,8 +14,9 @@ class MahotasMaskService:
         for dir in dirs:
             try:
                 os.mkdir(dir)
+                print("Directory already created.")
             except:
-                pass
+                print("Directory already exist.")
             
     def _get_datetime_format(self):
         current_time = datetime.datetime.now()
@@ -43,19 +42,37 @@ class MahotasMaskService:
         img_mask[img_mask < 255] = 0
         img_mask = cv2.bitwise_not(img_mask)
 
-        self.current_img = img
-        self.current_img_mask = img_mask
-
         return img_mask
     
-    def save_image(self, path):
-        ret = cv2.imwrite(f"{path}/{self._get_datetime_format()}.jpg", self.current_img)
+    def save_image(self, img, path):
+        ret = cv2.imwrite(f"{path}/{self._get_datetime_format()}.jpg", img)
         if not ret:
             return False
         return True
     
-    def save_image_mask(self, path):
-        ret = cv2.imwrite(f"{path}/{self._get_datetime_format()}_mask.jpg", self.current_img_mask)
+    def save_image_mask(self, img_mask, path):
+        ret = cv2.imwrite(f"{path}/{self._get_datetime_format()}_mask.jpg", img_mask)
         if not ret:
             return False
         return True
+
+'''
+import mahotas
+import numpy as np
+import cv2
+img = cv2.imread('ponte.jpg')
+img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # converte
+suave = cv2.GaussianBlur(img, (7, 7), 0) # aplica blur
+T = mahotas.thresholding.rc(suave)
+temp2 = img.copy()
+temp2[temp2 > T] = 255
+temp2[temp2 < 255] = 0
+temp2 = cv2.bitwise_not(temp2)
+resultado = np.vstack([
+np.hstack([img, suave]),
+np.hstack([temp, temp2]) ])
+cv2.imshow("Binarização com método Otsu e Riddler-
+Calvard", resultado)
+cv2.waitKey(0)
+
+'''

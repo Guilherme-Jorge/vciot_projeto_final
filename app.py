@@ -43,8 +43,8 @@ while True:
         break
 
     if key_input == ord("p"):
-        mask_service.save_image(img)
-        mask_service.save_image_mask(img_after_mask)
+        mask_service.save_image(img, PATH_TO_IMAGES)
+        mask_service.save_image_mask(img_after_mask, PATH_TO_IMAGES)
 
     if key_input == ord("c"):
         bw_flag = not bw_flag
