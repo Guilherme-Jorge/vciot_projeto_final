@@ -1,7 +1,6 @@
 import os
 import cv2
 import mahotas
-import numpy as np
 import datetime
 
 
@@ -28,7 +27,7 @@ class MahotasMaskService:
     def process_image(self, img, ksize=(7, 7), sigmaX=0):
         img_bw = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_blur = cv2.GaussianBlur(img_bw, ksize, sigmaX)
-        
+
         threshold = mahotas.thresholding.rc(img_blur)
         threshold -= threshold/2
         # threshold = 39
