@@ -21,7 +21,7 @@ ws_flag = True
 try:
     cam = cv2.VideoCapture(HTTP_CAM_HOST)
     ret, img = cam.read()
-    if not ret:
+    if ret:
         ws_flag = False
 except Exception as error:
     pass
