@@ -5,8 +5,8 @@ HTTP_CAM_HOST = f"https://{WEBSOCKET_HOST}:81/stream"
 
 PATH_TO_IMAGES = "images/"
 
-X_STOP = 210
-X_LOW = 180
+X_STOP = 128
+X_LOW = 80
 X_HIGH = 0
 
 Y_STOP = 128

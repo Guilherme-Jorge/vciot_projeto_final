@@ -51,9 +51,9 @@ while True:
 
     # Finds image heigh x width first time it runs
     if not get_size_flag:
-        img_h, _img_w = img.shape[:2]
-        center_left = img_h * 0.25
-        center_right = img_h * 0.75
+        _img_h, img_w = img.shape[:2]
+        center_left = img_w * 0.25
+        center_right = img_w * 0.75
         get_size_flag = True
 
     img_mask = mask_service.process_image(img)
@@ -78,7 +78,7 @@ while True:
                     # Move left wheel faster
                     ws.send(f'{{"x": {X_LOW}, "y": {Y_HIGH}}}')
                 if cx < center_right and cx > center_left:
-                    print("Straighten out")
+                    print("Continue straigh")
                     # Move both wheels faster
                     ws.send(f'{{"x": {X_HIGH}, "y": {Y_HIGH}}}')
                 if cx <= center_left:
@@ -86,7 +86,10 @@ while True:
                     # Move right wheel faster
                     ws.send(f'{{"x": {X_HIGH}, "y": {Y_LOW}}}')
 
-                cv2.circle(img, (cx, cy), 5, (255, 255, 255), -1)
+                # cv2.circle(img, (cx, cy), 5, (255, 255, 255), -1)
+    else:
+        print("No line detected!")
+        ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
 
     cv2.drawContours(img, c, -1, (0, 255, 0), 1)
 
@@ -118,6 +121,7 @@ while True:
 
     # Move the car (TEMPORARY)
     if key_input == ord("m"):
+        ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
         move_flag = not move_flag
 
 ws.close()
