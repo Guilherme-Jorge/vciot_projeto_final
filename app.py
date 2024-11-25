@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 import websocket
 from config.config import (
     WEBSOCKET_HOST,
@@ -11,6 +12,12 @@ from config.config import (
     Y_STOP,
     Y_LOW,
     Y_HIGH,
+    X_STRAIGHT,
+    X_RIGHT,
+    X_LEFT,
+    Y_LEFT,
+    Y_RIGHT,
+    Y_STRAIGHT
 )
 from services.mahotas_mask.mahotas_mask_service import MahotasMaskService
 
@@ -60,8 +67,7 @@ while True:
 
     # Creates contours on image
     contours, hierarchy = cv2.findContours(img_mask, 1, cv2.CHAIN_APPROX_NONE)
-    if len(contours) > 0:
-        # Finds the area with the largest contour area
+    if len(contours) > 0:        # Finds the area with the largest contour area
         c = max(contours, key=cv2.contourArea)
         M = cv2.moments(c)
 
@@ -69,23 +75,30 @@ while True:
             # Finds the center of the contour area
             cx = M["m10"] // M["m00"]
             cy = M["m01"] // M["m00"]
-            print(f"CX : {cx}  CY : {cy}")
+            # print(f"CX : {cx}  CY : {cy}")
 
             # Logic to move the car
             if move_flag:
                 if cx >= center_right:
                     print("Turn left")
                     # Move left wheel faster
-                    ws.send(f'{{"x": {X_LOW}, "y": {Y_HIGH}}}')
+                    # ws.send(f'{{"x": {X_LOW}, "y": {Y_HIGH}}}')
+                    ws.send(f'{{"x": {X_RIGHT}, "y": {Y_RIGHT}}}')
                 if cx < center_right and cx > center_left:
                     print("Continue straigh")
                     # Move both wheels faster
-                    ws.send(f'{{"x": {X_HIGH}, "y": {Y_HIGH}}}')
+                    # ws.send(f'{{"x": {X_HIGH}, "y": {Y_HIGH}}}')
+                    ws.send(f'{{"x": {X_STRAIGHT}, "y": {Y_STRAIGHT}}}')
                 if cx <= center_left:
                     print("Turn right")
                     # Move right wheel faster
-                    ws.send(f'{{"x": {X_HIGH}, "y": {Y_LOW}}}')
+                    # ws.send(f'{{"x": {X_HIGH}, "y": {Y_LOW}}}')
+                    ws.send(f'{{"x": {X_LEFT}, "y": {Y_LEFT}}}')
 
+                time.sleep(0.1)
+                ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
+
+                
                 # cv2.circle(img, (cx, cy), 5, (255, 255, 255), -1)
     else:
         print("No line detected!")

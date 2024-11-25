@@ -29,7 +29,7 @@ class MahotasMaskService:
         img_blur = cv2.GaussianBlur(img_bw, ksize, sigmaX)
 
         threshold = mahotas.thresholding.rc(img_blur)
-        threshold -= threshold/2
+        threshold -= threshold/2 + threshold/10
         # threshold = 39
 
         img_mask = img_bw.copy()
