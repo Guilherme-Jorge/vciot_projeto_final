@@ -1,7 +1,10 @@
 '''
+Bruno Fontolan Alves                - RA: 22010823
 Enrico Ribeiro Farina               - RA: 22007679
 Guilherme Ferreira Jorge            - RA: 22007283
+Gustavo de Campos Soares            - RA: 22000578
 João Paulo Toledo de Almeida Arrigo - RA: 22005246
+Rafael Lanza de Queiroz             - RA: 22010825
 '''
 
 import os
