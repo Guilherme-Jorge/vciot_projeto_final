@@ -1,19 +1,30 @@
+'''
+Enrico Ribeiro Farina               - RA: 22007679
+Guilherme Ferreira Jorge            - RA: 22007283
+João Paulo Toledo de Almeida Arrigo - RA: 22005246
+'''
+
 import os
 import cv2
 import datetime
-import mahotas
 import numpy as np
+import mahotas
 import websocket
 
 WEBSOCKET_HOST = "192.168.4.1"
 HTTP_CAM_HOST = f"https://{WEBSOCKET_HOST}:81/stream"
+
 PATH_TO_IMAGES = "images/"
-X_STOP = 128
-X_LOW = 80
-X_HIGH = 0
-Y_STOP = 128
-Y_LOW = 170
-Y_HIGH = 255
+
+X_STOP = 127
+Y_STOP = 127
+
+X_STRAIGHT = 62
+Y_STRAIGHT = 197
+X_LEFT = 47
+Y_LEFT = 198
+X_RIGHT = 60
+Y_RIGHT = 218
 
 class MahotasMaskService:
     def __init__(self, path_list):
@@ -102,17 +113,19 @@ while True:
 
     # Finds image heigh x width first time it runs
     if not get_size_flag:
-        _img_h, img_w = img.shape[:2]
-        center_left = img_w * 0.25
-        center_right = img_w * 0.75
-        get_size_flag = True
+        try:
+            _img_h, img_w = img.shape[:2]
+            center_left = img_w * 0.25
+            center_right = img_w * 0.75
+            get_size_flag = True
+        except:
+            pass
 
     img_mask = mask_service.process_image(img)
 
     # Creates contours on image
     contours, hierarchy = cv2.findContours(img_mask, 1, cv2.CHAIN_APPROX_NONE)
-    if len(contours) > 0:
-        # Finds the area with the largest contour area
+    if len(contours) > 0:        # Finds the area with the largest contour area
         c = max(contours, key=cv2.contourArea)
         M = cv2.moments(c)
 
@@ -120,23 +133,23 @@ while True:
             # Finds the center of the contour area
             cx = M["m10"] // M["m00"]
             cy = M["m01"] // M["m00"]
-            print(f"CX : {cx}  CY : {cy}")
+            # print(f"CX : {cx}  CY : {cy}")
 
             # Logic to move the car
             if move_flag:
                 if cx >= center_right:
-                    print("Turn left")
+                    print("Turn right")
                     # Move left wheel faster
-                    ws.send(f'{{"x": {X_LOW}, "y": {Y_HIGH}}}')
+                    ws.send(f'{{"x": {X_RIGHT}, "y": {Y_RIGHT}}}')
                 if cx < center_right and cx > center_left:
                     print("Continue straigh")
                     # Move both wheels faster
-                    ws.send(f'{{"x": {X_HIGH}, "y": {Y_HIGH}}}')
+                    ws.send(f'{{"x": {X_STRAIGHT}, "y": {Y_STRAIGHT}}}')
                 if cx <= center_left:
-                    print("Turn right")
+                    print("Turn left")
                     # Move right wheel faster
-                    ws.send(f'{{"x": {X_HIGH}, "y": {Y_LOW}}}')
-
+                    ws.send(f'{{"x": {X_LEFT}, "y": {Y_LEFT}}}')
+                
                 # cv2.circle(img, (cx, cy), 5, (255, 255, 255), -1)
     else:
         print("No line detected!")
@@ -170,10 +183,11 @@ while True:
     if key_input == ord("c"):
         bw_flag = not bw_flag
 
-    # Move the car (TEMPORARY)
+    # Move the car
     if key_input == ord("m"):
         ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
         move_flag = not move_flag
 
 ws.close()
 cv2.destroyAllWindows()
+

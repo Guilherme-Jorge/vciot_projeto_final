@@ -1,23 +1,18 @@
 import cv2
 import numpy as np
-import time
 import websocket
 from config.config import (
     WEBSOCKET_HOST,
     HTTP_CAM_HOST,
     PATH_TO_IMAGES,
     X_STOP,
-    X_LOW,
-    X_HIGH,
     Y_STOP,
-    Y_LOW,
-    Y_HIGH,
     X_STRAIGHT,
     X_RIGHT,
     X_LEFT,
     Y_LEFT,
     Y_RIGHT,
-    Y_STRAIGHT
+    Y_STRAIGHT,
 )
 from services.mahotas_mask.mahotas_mask_service import MahotasMaskService
 
@@ -58,10 +53,13 @@ while True:
 
     # Finds image heigh x width first time it runs
     if not get_size_flag:
-        _img_h, img_w = img.shape[:2]
-        center_left = img_w * 0.25
-        center_right = img_w * 0.75
-        get_size_flag = True
+        try:
+            _img_h, img_w = img.shape[:2]
+            center_left = img_w * 0.25
+            center_right = img_w * 0.75
+            get_size_flag = True
+        except:
+            pass
 
     img_mask = mask_service.process_image(img)
 
@@ -80,24 +78,17 @@ while True:
             # Logic to move the car
             if move_flag:
                 if cx >= center_right:
-                    print("Turn left")
+                    print("Turn right")
                     # Move left wheel faster
-                    # ws.send(f'{{"x": {X_LOW}, "y": {Y_HIGH}}}')
                     ws.send(f'{{"x": {X_RIGHT}, "y": {Y_RIGHT}}}')
                 if cx < center_right and cx > center_left:
                     print("Continue straigh")
                     # Move both wheels faster
-                    # ws.send(f'{{"x": {X_HIGH}, "y": {Y_HIGH}}}')
                     ws.send(f'{{"x": {X_STRAIGHT}, "y": {Y_STRAIGHT}}}')
                 if cx <= center_left:
-                    print("Turn right")
+                    print("Turn left")
                     # Move right wheel faster
-                    # ws.send(f'{{"x": {X_HIGH}, "y": {Y_LOW}}}')
                     ws.send(f'{{"x": {X_LEFT}, "y": {Y_LEFT}}}')
-
-                time.sleep(0.1)
-                ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
-
                 
                 # cv2.circle(img, (cx, cy), 5, (255, 255, 255), -1)
     else:
@@ -132,7 +123,7 @@ while True:
     if key_input == ord("c"):
         bw_flag = not bw_flag
 
-    # Move the car (TEMPORARY)
+    # Move the car
     if key_input == ord("m"):
         ws.send(f'{{"x": {X_STOP}, "y": {Y_STOP}}}')
         move_flag = not move_flag
